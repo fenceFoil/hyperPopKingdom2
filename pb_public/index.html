@@ -279,13 +279,13 @@
     
                 </div>
             </div>
-            <div id="tray">
-                    <div id="thisPlayerIcon" class="playerIcon" :class = "{}" x-text="myName" @touchstart="onPlayerIcon()" @mousedown="onPlayerIcon()">
+            <div id="tray" style="justify-content: center;margin-top: 1em">
+                    <div id="thisPlayerIcon" x-html="renderSymbol(me)">
                     </div>
                     <div style="font-size: 3em; display: grid; place-items: center;padding: 1ch;">
                         vs
                     </div>
-                    <div id="vsIcon" class="playerIcon" x-text="vsName" @touchstart="onPlayerIcon()" @mousedown="onPlayerIcon()">
+                    <div id="vsIcon" x-html="renderSymbol(currentOpponent)">
                     </div>
             </div>
         </div>
@@ -345,50 +345,50 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const eloSpan = document.querySelector('.myElo span');
-            const eloText = eloSpan.textContent;
-            const eloValue = Number(eloText);
-            const probability = 1000;
-            const reducedProbability = (probability - Math.ceil(eloValue / 2));
-            const baseProbability = eloValue > 100 ? reducedProbability <= 1 ? 1 : reducedProbability : probability;
+            // const eloSpan = document.querySelector('.myElo span');
+            // const eloText = eloSpan.textContent;
+            // const eloValue = Number(eloText);
+            // const probability = 1000;
+            // const reducedProbability = (probability - Math.ceil(eloValue / 2));
+            // const baseProbability = eloValue > 100 ? reducedProbability <= 1 ? 1 : reducedProbability : probability;
 
-            console.log("Base Prob. " + eloValue);
+            // console.log("Base Prob. " + eloText);
 
-            // Randomly decide the bubble color with a rare chance for rainbowShift
-            function getRandomBubbleColor() {
-                const colors = [
-                    "pink", "yellowgreen", "deepskyblue", "gold", "tomato", 'orangered',
-                    "lavender", "yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen", "yellowgreen","yellowgreen"
-                ];
-                // Adjust the chance for rainbowShift by changing the 1000 to a different value for rarity
-                return Math.random() < 1/baseProbability ? "rainbowShift" : chance.pickone(colors.filter(c => c !== "rainbowShift"));
-                // return "rainbowShift"
-            }
+            // // Randomly decide the bubble color with a rare chance for rainbowShift
+            // function getRandomBubbleColor() {
+            //     const colors = [
+            //         "pink", "yellowgreen", "deepskyblue", "gold", "tomato", 'orangered',
+            //         "lavender", "yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen", "yellowgreen","yellowgreen"
+            //     ];
+            //     // Adjust the chance for rainbowShift by changing the 1000 to a different value for rarity
+            //     return Math.random() < 1/baseProbability ? "rainbowShift" : chance.pickone(colors.filter(c => c !== "rainbowShift"));
+            //     // return "rainbowShift"
+            // }
 
             // Assuming you apply the color when generating the bubble scene
-            function applyBubbleColor() {
-                const bubbleColor = getRandomBubbleColor();
-                let startPosition = '0.0';
-                let delay = '0s';
-                let duration = '0s';
+            // function applyBubbleColor() {
+            //     const bubbleColor = getRandomBubbleColor();
+            //     let startPosition = '0.0';
+            //     let delay = '0s';
+            //     let duration = '0s';
 
-                document.querySelectorAll('.bubblefilter').forEach(element => {
-                    if (bubbleColor === "rainbowShift") {
-                        startPosition = Math.floor(Math.random() * 100) + '%';
-                        element.classList.add('rainbowShift');
-                        element.style.setProperty('--start-position', startPosition);
-                        delay = Math.random() * 5 + 's';
-                        // duration = Math.random() * 4 + 8 + 's';
-                        element.style.removeProperty('--unpoppedColor');
-                    } else {
-                        element.classList.remove('rainbowShift'); // Ensure class is not applied
-                        element.style.setProperty('--unpoppedColor', bubbleColor);
-                    }
-                });
-            }
+            //     document.querySelectorAll('.bubblefilter').forEach(element => {
+            //         if (bubbleColor === "rainbowShift") {
+            //             startPosition = Math.floor(Math.random() * 100) + '%';
+            //             element.classList.add('rainbowShift');
+            //             element.style.setProperty('--start-position', startPosition);
+            //             delay = Math.random() * 5 + 's';
+            //             // duration = Math.random() * 4 + 8 + 's';
+            //             element.style.removeProperty('--unpoppedColor');
+            //         } else {
+            //             element.classList.remove('rainbowShift'); // Ensure class is not applied
+            //             element.style.setProperty('--unpoppedColor', bubbleColor);
+            //         }
+            //     });
+            // }
 
             // Example trigger for color application (adjust according to when you need it to run)
-            applyBubbleColor();
+            // applyBubbleColor();
 
             // Your existing event listener logic for bubble interactions
             document.querySelectorAll('.unpopped').forEach(element => {
@@ -406,6 +406,8 @@
         });
 
         document.addEventListener('alpine:init', () => {
+            //let myIdPos = this.currentRound.players.indexOf(this.me.id);
+
             Alpine.data('d', () => ({
                 //hahaSound: new Howl({src: ['haha.mp3']}),
                 sounds: {
@@ -448,7 +450,16 @@
                 screen: 'makePlayerScreen',
                 me: {
                     name: "",
-                    elo: 2000,
+                    elo: 1000,
+                    symbol: {
+                        "power": "",
+                        "power2": "",
+                        "creature": ""
+                    }
+                },
+                currentOpponent: {
+                    name: "",
+                    elo: 1000,
                     symbol: {
                         "power": "",
                         "power2": "",
@@ -501,6 +512,59 @@
                             localStorage.setItem("playerId", this.me.id)
                         }
                     }
+                    const eloSpan = document.querySelector('.myElo span');
+                    const eloText = eloSpan.textContent;
+                    const eloValue = this.me.elo;
+                    const probability = 1375;
+                    const reducedProbability = (probability - (eloValue / 2));
+                    const baseProbability = eloValue > 100 ? reducedProbability <= 1 ? 1 : reducedProbability : probability;
+
+                    console.log("Base Prob. " + eloValue);
+
+                    // Randomly decide the bubble color with a rare chance for rainbowShift
+                    function getRandomBubbleColor() {
+                        const colors = [
+                            "pink", "yellowgreen", "deepskyblue", "gold", "tomato", 'orangered',
+                            "lavender", "yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen","yellowgreen", "yellowgreen","yellowgreen"
+                        ];
+                        // Adjust the chance for rainbowShift by changing the 1000 to a different value for rarity
+                        return Math.random() < 1/baseProbability ? "rainbowShift" : chance.pickone(colors.filter(c => c !== "rainbowShift"));
+                        // return "rainbowShift"
+                    }
+
+                    function applyBubbleColor() {
+                        const bubbleColor = getRandomBubbleColor();
+                        let startPosition = '0.0';
+                        let delay = '0s';
+                        let duration = '0s';
+
+                        document.querySelectorAll('.bubblefilter').forEach(element => {
+                            if (bubbleColor === "rainbowShift") {
+                                startPosition = Math.floor(Math.random() * 100) + '%';
+                                element.classList.add('rainbowShift');
+                                element.style.setProperty('--start-position', startPosition);
+                                delay = Math.random() * 5 + 's';
+                                // duration = Math.random() * 4 + 8 + 's';
+                                element.style.removeProperty('--unpoppedColor');
+                            } else {
+                                element.classList.remove('rainbowShift'); // Ensure class is not applied
+                                element.style.setProperty('--unpoppedColor', bubbleColor);
+                            }
+                        });
+                    }
+
+                    applyBubbleColor();
+
+                    document.querySelectorAll('.bubblefilter').forEach((element, index) => {
+                        // Only apply to elements with the rainbowShift class 
+                        if (element.classList.contains('rainbowShift') && Math.random() < 1 / baseProbability) {
+                            const startPosition = Math.floor(Math.random() * 100); // Random start from 0% to 100%
+                            const animationDuration = 16 + Math.random() * 4; // Variation from 16s to 20s
+
+                            element.style.setProperty('--start-position', startPosition + '%');
+                            element.style.animationDuration = animationDuration + 's';
+                        }
+                    });
 
                     this.playMusic();
 
@@ -613,12 +677,15 @@
                             this.currentRound = e.record;
                         }
                     })
+                                            let myIdPos = this.currentRound.players.indexOf(this.me.id);
+                        let opponentPlayerId = this.currentRound.players[myIdPos === 0?1:0];
+                    this.currentOpponent = await this.pb.collection("players").getOne(opponentPlayerId);
                 },
 
                 async playMusic () {
                     const eloSpan = document.querySelector('.myElo span');
                     const eloText = eloSpan.textContent;
-                    const eloValue = Number(eloText);
+                    const eloValue = this.me.elo;
                     const probability = 1000;
                     const reducedProbability = (probability - (eloValue / 2));
                     const baseProbability = eloValue > 100 ? reducedProbability <= 1 ? 1 : reducedProbability : probability;
@@ -628,6 +695,8 @@
                     const maxVal = 10000;
                     const minFloat = 0.25;
                     const maxFloat = 1.25;
+
+                    console.log("base test " + eloValue);
 
                     let eloV = Math.max(minVal, Math.min(maxVal, eloValue));
 
@@ -642,7 +711,7 @@
 
                     console.log(floatVal);
 
-                    if (Math.random() < 1/baseProbability) {
+                    if (Math.random() > 1/baseProbability) {
                         // musicSound1.rate(chance.floating({ min: 0.5, max: 2 }));
                         musicSound1.rate(floatVal);
                         musicSound1.play();
@@ -684,7 +753,7 @@
                             eloChange: Elo.getRatingDelta(this.me.elo, opponentElo, 1),
                             eloValue: Elo.getNewRating(this.me.elo, opponentElo, 1),
                         })
-                        console.log(`elo time! ${opponentElo} ${this.me.elo} ${Elo.getNewRating(this.me.elo, opponentElo, 1)}`)
+                        console.log(`elo time! ${opponentElo} ${this.me.elo} ${Elo.getRatingDelta(this.me.elo, opponentElo, 1)}`)
                         // Update my opponent's ELO
                         this.pb.collection('players').update(opponentPlayerId, {
                             elo: Elo.getNewRating(opponentElo, this.me.elo, 0)
@@ -694,9 +763,15 @@
                             eloChange: Elo.getRatingDelta(opponentElo, this.me.elo, 0),
                             eloValue: Elo.getNewRating(opponentElo, this.me.elo, 0),
                         })
+                        alert(`You won! Elo: ${Elo.getNewRating(this.me.elo, opponentElo, 1)} (${Elo.getRatingDelta(this.me.elo, opponentElo, 1)})`)
                     } else {
                         // Loser doesn't do anything
                         console.log("I lost the round")
+                        let myIdPos = this.currentRound.players.indexOf(this.me.id);
+                        let opponentPlayerId = this.currentRound.players[myIdPos === 0?1:0];
+                        let opponentElo = (await this.pb.collection('players').getOne(opponentPlayerId)).elo;
+
+                        alert(`You did not win per se! Elo: ${Elo.getNewRating(this.me.elo, opponentElo, 0)} (${Elo.getRatingDelta(this.me.elo, opponentElo, 0)})`)
                         // TODO: Update loser seconds
                     }
 
@@ -760,27 +835,6 @@
                     return `<div class="playerSymbol" style="background-color: ${player.symbol.color}"><div class="power">${player.symbol.power}</div><div class="power2">${player.symbol.power2}</div><div class="creature">${player.symbol.creature}</div></div>`
                 }
             }));
-
-            document.addEventListener('DOMContentLoaded', function() {
-                const eloSpan = document.querySelector('.myElo span');
-                const eloText = eloSpan.textContent;
-                const eloValue = Number(eloText);
-                const probability = 1375;
-                const reducedProbability = (probability - (eloValue / 2));
-                const baseProbability = eloValue > 100 ? reducedProbability <= 1 ? 1 : reducedProbability : probability;
-
-                document.querySelectorAll('.bubblefilter').forEach((element, index) => {
-                    // Only apply to elements with the rainbowShift class 
-                    if (element.classList.contains('rainbowShift') && Math.random() < 1 / baseProbability) {
-                        const startPosition = Math.floor(Math.random() * 100); // Random start from 0% to 100%
-                        const animationDuration = 16 + Math.random() * 4; // Variation from 16s to 20s
-
-                        element.style.setProperty('--start-position', startPosition + '%');
-                        element.style.animationDuration = animationDuration + 's';
-                    }
-                });
-            });
-
         });
     </script>
 </body>
